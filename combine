@@ -1,0 +1,110 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Mar 20 11:35:38 2018
+
+@author: Administrator
+"""
+
+import os
+import csv 
+import json
+import pandas as pd
+from pandas import DataFrame,Series
+
+
+with open(r'E:\宋心艺\result\xinyi.csv',encoding='UTF-8') as csvfile_1:
+    info_1 = pd.read_csv(csvfile_1)
+    #print(info_1['entity'][0][0])
+    #all_entity_1 = info_1['entity']
+    
+with open(r'E:\宋心艺\result\xinyi_2_1.csv',encoding='UTF-8') as csvfile_2_1:
+    #all_lines = csv.reader((line.replace('\0','') for line in csvfile),delimiter=",")
+    #for one_line in all_lines:
+        #files.append(one_line)
+    info_2_1 = pd.read_csv(csvfile_2_1)
+    #all_entity_2_1 = info_2_1['entity']
+    #print(info_2_1)
+
+#######################添加第300000条#############################
+import os
+import csv 
+import json
+import pandas as pd
+files = []
+
+with open(r'E:\宋心艺\result\files_2.csv',encoding='UTF-8') as csvfile_3:
+    all_lines = csv.reader(csvfile_3)
+    for one_line in all_lines:
+        files.extend(one_line)
+        
+filename = files[300000]
+str1 = '_'
+end = filename.find(str1)
+number = filename[0:end]
+
+domain = os.path.abspath(r'E:\宋心艺\xinyi_2')
+filepath = os.path.join(domain,filename)
+    
+ff = open(filepath,encoding="utf-8")
+info_300000 = json.load(ff)
+#print(info_300000)
+    
+#str = '\n'
+#info_300000['entity'] = list(filter(lambda x: x.count(str)==0 , info_300000['entity']))
+#print(info_300000['entity'][0])
+info_300000['entity'] = "['内容简介', '图书目录']"
+    
+info_300000['number'] = number
+name = ['title','number','entity','summary']
+info_3 = pd.Series(info_300000,index=name)
+#print(info_3['entity'][0])
+#all_entity_3 = info_3['entity']
+####################################################################
+    
+with open(r'E:\宋心艺\result\xinyi_2_2.csv',encoding='UTF-8') as csvfile_2_2:
+    info_2_2 = pd.read_csv(csvfile_2_2)
+    #all_entity_2_2 = info_2_2['entity']
+    #print(info_2_2)
+
+######################合并文件######################################
+frames1 = [info_1, info_2_1]
+info = pd.concat(frames1, ignore_index=True)
+info = info.append(info_3, ignore_index=True)
+frames2 = [info, info_2_2]
+info = pd.concat(frames2, ignore_index=True) 
+#print(info[0:100]) 
+#info.to_csv(r'E:\宋心艺\result\xinyi_all.csv',index = False,encoding = 'utf-8')
+    
+######################合并entity####################################
+obj = []
+all_entity = info['entity']
+all_entity = all_entity.tolist()
+#print(all_entity[0:100])
+for one in all_entity:
+    one = one[1:len(one)-1]+', ' #去掉[]
+    #print(one)
+    obj.extend(one)
+#print(obj[0])
+
+obj = ''.join(obj)
+#while ' ' in obj:
+    #obj.remove(' ')
+        
+obj = obj.split(', ')
+#print(obj[0:100])
+
+obb = []
+for ones in obj:
+    ones = ones[1:len(ones)-1]#去掉‘’
+    #print()
+    obb.append(ones)
+#print(obb[0:100])
+    
+####################统计obj出现次数###################################
+obj_all = pd.Series(obb)
+obj_all.to_csv(r'E:\宋心艺\result\xinyi_all_obj.csv', index = False, encoding = 'utf-8')
+#print(obj_all[0:100])
+
+obj_all_count = obj_all.value_counts()
+#print(obj_all_count)
+obj_all_count.to_csv(r'E:\宋心艺\result\xinyi_all_obj_count.csv', index = True, encoding = 'utf-8')
