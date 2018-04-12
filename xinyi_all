@@ -1,0 +1,133 @@
+ -*- coding: utf-8 -*-
+"""
+Created on Wed Mar 21 14:50:48 2018
+
+@author: Administrator
+"""
+
+import os 
+import csv
+import glob
+import json
+import pandas as pd
+from pandas import DataFrame,Series
+
+#############################产生xinyi的文件名###########################
+os.getcwd()
+os.chdir(r'E:\宋心艺\xinyi_all\for_xinyi')
+
+files=glob.glob('*.json')
+
+files = pd.Series(files)
+files.to_csv(r'E:\宋心艺\result\files_1.csv',index = False,encoding = 'utf-8')
+
+############################合并文件名###################################
+import csv
+import pandas as pd
+
+files_all = []
+
+with open(r'E:\宋心艺\result\files_1.csv',encoding='UTF-8') as csvfile_1:
+    all_lines = csv.reader(csvfile_1)
+    for one_line in all_lines:
+        files_all.extend(one_line)
+
+with open(r'E:\宋心艺\result\files_2.csv',encoding='UTF-8') as csvfile_2:
+    all_lines = csv.reader(csvfile_2)
+    for one_line in all_lines:
+        files_all.extend(one_line)
+
+#import pandas as pd
+files_all = pd.Series(files_all)
+files_all.to_csv(r'E:\宋心艺\result\files_all.csv',index = False,encoding = 'utf-8')
+
+###########################读取文件######################################
+import os 
+import csv
+import json
+import pandas as pd
+
+files_all = []
+
+with open(r'E:\宋心艺\result\files_1.csv',encoding='UTF-8') as csvfile:
+    all_lines = csv.reader(csvfile)
+    for one_line in all_lines:
+        files_all.extend(one_line)
+
+result1 = []       
+        
+for filename in files_all:
+    str1 = '_'
+    end = filename.find(str1)
+    number = filename[0:end]
+    
+    domain = os.path.abspath(r'E:\宋心艺\xinyi_all\for_xinyi')
+    filepath = os.path.join(domain,filename)
+    
+    f = open(filepath,encoding="utf-8")
+    info = json.load(f)
+    
+    info['number'] = number
+    name = ['title','number','entity','summary']
+    data = pd.Series(info,index=name)
+    #print(data)
+    #print(data['title'],data['entity'],data['summary'])
+    result1.append(data)
+
+result1 = pd.DataFrame(result1)
+#print(result)
+import pandas as pd
+frames = [result1, result]
+result_all = pd.concat(frames)
+
+result_all.to_csv(r'E:\宋心艺\result\result_all.csv',index = False,encoding = 'utf-8')
+
+#########################统计实体词#########################################
+import csv
+
+all_entity = []
+with open(r'E:\宋心艺\result\result_all_obj.csv',encoding='UTF-8') as csvfile:
+    all_lines = csv.reader(csvfile)
+    for one_line in all_lines:
+        all_entity.extend(one_line)
+
+obj = []        
+for one in all_entity:
+    one = one[1:len(one)-1]+', ' #去掉[]
+    #print(one)
+    obj.extend(one)
+
+obj = ''.join(obj)
+#while ' ' in obj:
+    #obj.remove(' ')
+        
+obj = obj.split(', ')
+#print(obj[0:100])
+
+obb = []
+for ones in obj:
+    ones = ones[1:len(ones)-1]#去掉‘’
+    #print()
+    obb.append(ones)
+#print(obb[0:100])
+
+str1 = '\\n3\\n'
+str2 = '\\n3.'
+entity_3 = list(filter(lambda x: x.count(str1)==1 or x.count(str2)==1, obb))
+#print(entity_1[0:100])
+import pandas as pd
+entity_3 = pd.Series(entity_3)
+entity_3.to_csv(r'E:\宋心艺\result\result_all_obj_3.csv',index = False,encoding = 'utf-8')
+
+#print(entity_3)
+entity_3_0 = []
+for string in entity_3:
+    string = string.rstrip('\\n') #去掉右边的\n
+    end = string.find('\\n',2)+1 #找到 n 的位置
+    string = string[end+1:len(string)]
+    entity_3_0.append(string) 
+#print(entity_2_0[0:100])
+
+entity_3_0 = pd.Series(entity_3_0)
+entity_3_count = entity_3_0.value_counts()
+entity_3_count.to_csv(r'E:\宋心艺\result\result_all_obj_count_3.csv',index = True,encoding = 'utf-8')
