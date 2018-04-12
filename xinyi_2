@@ -1,0 +1,67 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Mar 15 16:17:52 2018
+
+@author: Administrator
+"""
+
+import os
+import csv 
+import glob
+import json
+import pandas as pd
+from pandas import DataFrame,Series
+
+os.getcwd()
+os.chdir(r'E:\宋心艺\xinyi_2')
+
+result = []
+all_entity = []
+files = []
+
+#files=glob.glob('*.json')
+with open(r'E:\宋心艺\result\files_2.csv',encoding='UTF-8') as csvfile:
+    all_lines = csv.reader(csvfile)
+    for one_line in all_lines:
+        files.extend(one_line)
+#print(files)
+
+
+for filename in files[300001:600000]:
+    str1 = '_'
+    end = filename.find(str1)
+    number = filename[0:end]
+    
+    domain = os.path.abspath(r'E:\宋心艺\xinyi_2')
+    filepath = os.path.join(domain,filename)
+    
+    f = open(filepath,encoding="utf-8")
+    info = json.load(f)
+    
+    str = '\n'
+    info['entity'] = list(filter(lambda x: x.count(str)==0 , info['entity']))
+    
+    all_entity.extend(info['entity'])    
+    
+    info['number'] = number
+    name = ['title','number','entity','summary']
+    data = pd.Series(info,index=name)
+    #print(data)
+    #print(data['title'],data['entity'],data['summary'])
+    result.append(data)
+    
+#print(result)
+result2 = pd.DataFrame(result)
+#print(result2)
+result2.to_csv(r'E:\宋心艺\result\xinyi_2_2.csv',index = False,encoding = 'utf-8')
+
+"""
+统计实体词的个数
+"""
+obj = pd.Series(all_entity)
+obj.to_csv(r'E:\宋心艺\result\xinyi_2_2_obj.csv',encoding = 'utf-8')    
+
+#print(obj)     
+#obj_count = obj.value_counts()
+#print(obj_count)
+#obj_count.to_csv(r'E:\宋心艺\result\xinyi_obj_count.csv',encoding = 'utf-8')
